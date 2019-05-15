@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 function social_media_stats_get_meta( $value ) {
 	global $post;
@@ -26,15 +26,20 @@ add_action( 'add_meta_boxes', 'social_media_stats_add_meta_box' );
 function social_media_stats_html( $post) {
 	error_reporting(0);
 	wp_nonce_field( '_social_media_stats_nonce', 'social_media_stats_nonce' ); ?>
-	<?php 
+	<?php
 	smt_all_js_css_scripts();
 	?>
-	<?php 
+	<?php
+	// Get URL and strip out Facebook username
 	$username = basename(get_post_meta($post->ID,'social_media_analytics_fb_media_account_link',true));
+
+	// Fetch the Facebook Gender Data
 	$facebookdata = smt_get_facebook_page_gender_data($username);
 	?>
-	<div id="facebook_container">	
-	<?php if(!$facebookdata){
+	<div id="facebook_container">
+	<?php
+	// Check if Facebook data has been fetched
+	if(!$facebookdata){
 		?>
 		<div class="api_error_smt">
 			There is issue with API Details - Please check it!
@@ -44,11 +49,11 @@ function social_media_stats_html( $post) {
 	else {
 	 ?>
 	<div class="smt_profile_user img_user_ig">
-		<?php 
+		<?php
 			$profileurl = smt_get_facebook_page_profile_url($username);
 		?>
 		<img src="<?php print_r($profileurl->data->url); ?>" />
-	</div>	 
+	</div>
 	<table class="smt_table">
 		<tr>
 			<th class="smt_head">
@@ -66,7 +71,7 @@ function social_media_stats_html( $post) {
 					<input type="hidden" value="<?php echo smt_get_facebook_page_likes($username); ?>" name="fb_total_likes" />
 				</td>
 			</tr>
-			<?php 
+			<?php
 			$get_raw_gender = smt_get_facebook_raw_data('insights',$username);
 			?>
 			<?php
@@ -130,7 +135,7 @@ function social_media_stats_html( $post) {
 	<?php } ?>
 </div>
 <!-- IG -->
-<?php 
+<?php
 $username = basename(get_post_meta($post->ID,'social_media_analytics_ig_media_account_link',true));
 $fbpageid = get_post_meta($post->ID,'social_media_analytics_ig_fb_media_account',true);
 ?>
@@ -138,8 +143,8 @@ $fbpageid = get_post_meta($post->ID,'social_media_analytics_ig_fb_media_account'
 	<?php if(smt_get_insta_follower($fbpageid)) { ?>
 		<div class="smt_profile_user img_user_ig">
 			<img src="<?php echo smt_get_insta_profile_url($fbpageid); ?>" />
-		</div>					
-		<table class="smt_table">		
+		</div>
+		<table class="smt_table">
 			<tr>
 				<th class="smt_head">
 					Data
@@ -175,22 +180,22 @@ $fbpageid = get_post_meta($post->ID,'social_media_analytics_ig_fb_media_account'
 				$totallikes = $maletotal+$femaletotal;
 				$maleperc = ($maletotal*100)/$totallikes;
 				$femperc = ($femaletotal*100)/$totallikes;
-			
-			?>	
+
+			?>
 			<tr>
 				<td>
 					Highest Gender
 				</td>
 				<td>
-					<?php 
-				
+					<?php
+
 				$array = json_decode(json_encode($iggenderdata), true);
 				arsort($array);
 				$first_key = key($array);
-				$first_value = reset($array);	
+				$first_value = reset($array);
 
 					?>
-				<?php $gender = explode(".",$first_key); if($gender[0] == "M"){ echo "Male"; } else{ echo "Female"; } ?>	
+				<?php $gender = explode(".",$first_key); if($gender[0] == "M"){ echo "Male"; } else{ echo "Female"; } ?>
 					<span class="smt_numperctage">Percentage: <strong>(<?php echo round($maleperc,2) ?>% Male) - (<?php echo round($femperc,2) ?>% Female)</strong></span>
 					<input type="hidden" value="<?php $gender = explode(".",$first_key); if($gender[0] == "M"){ echo "Male"; } else{ echo "Female"; } ?>" name="ig_highest_gender" />
 					<input type="hidden" value="<?php echo round($maleperc,2); ?>" name="ig_per_male" />
@@ -233,7 +238,7 @@ $fbpageid = get_post_meta($post->ID,'social_media_analytics_ig_fb_media_account'
 </div>
 
 <!-- YouTube Container -->
-<?php 
+<?php
 $options = get_option( 'sma_settings' );
 $username = basename(get_post_meta($post->ID,'social_media_analytics_yt_media_account_link',true));
 $thumbdtata = json_decode(file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=snippet&fields=items%2Fsnippet%2Fthumbnails%2Fdefault&id='.$username.'&key=AIzaSyA2q0T0Sr9sW7RBdOIP9rCw0x19KVOMWxI'));
@@ -262,14 +267,14 @@ $thumbdtata = json_decode(file_get_contents('https://www.googleapis.com/youtube/
 					Subscribers
 				</td>
 				<td class="smt_td">
-					<?php 
+					<?php
 	echo smt_youtube_get_number_of_subscribers('AIzaSyA2q0T0Sr9sW7RBdOIP9rCw0x19KVOMWxI',$username);
 
 	?>
 	<input type="hidden" value="<?php  echo smt_youtube_get_number_of_subscribers('AIzaSyA2q0T0Sr9sW7RBdOIP9rCw0x19KVOMWxI',$username); ?>" name="yt_total_likes" />
 				</td>
 			</tr>
-	<?php 
+	<?php
 	$arrayinfo = "";
 	$allgenderrec = smt_youtube_get_age_gender($ytaccesstoken,$username);
 
@@ -293,7 +298,7 @@ $thumbdtata = json_decode(file_get_contents('https://www.googleapis.com/youtube/
 			$ytmalegen += $value[2];
 		}
 	}
-	?>			
+	?>
 			<tr>
 				<td>
 					Highest Gender
@@ -330,16 +335,16 @@ $thumbdtata = json_decode(file_get_contents('https://www.googleapis.com/youtube/
 			</tr>
 		</table>
 </div>
-<?php 
-$username = basename(get_post_meta($post->ID,'social_media_analytics_tw_media_account_link',true)); 
+<?php
+$username = basename(get_post_meta($post->ID,'social_media_analytics_tw_media_account_link',true));
 ?>
 <div id="twitter_container">
 		<div class="smt_profile_user img_user_ig">
-		<?php 
+		<?php
 			$profileurl = smt_get_twitter_profile_url($username);
 		?>
 			<img src="<?php echo $profileurl; ?>" />
-		</div>	 
+		</div>
 		<table class="smt_table">
 			<tr>
 				<th class="smt_head">
@@ -357,7 +362,7 @@ $username = basename(get_post_meta($post->ID,'social_media_analytics_tw_media_ac
 					<?php echo smt_get_twitter_follower($username);  ?>
 					<input type="hidden" value="<?php echo smt_get_twitter_follower($username);  ?>" name="tw_total_likes" />
 				</td>
-			</tr>		
+			</tr>
 			<tr>
 				<td>
 					Highest Gender
@@ -386,7 +391,7 @@ $username = basename(get_post_meta($post->ID,'social_media_analytics_tw_media_ac
 </div>
 <div class="smt_total_subscribers">
 	<div class="smt_total_sub_inner">
-		Total : <span class="total-sub-s"><?php 
+		Total : <span class="total-sub-s"><?php
 		$totalnum = 0;
 		if(social_media_analytics_get_meta( 'social_media_analytics_facebook' ) === 'facebook')
 		$totalnum = $totalnum + smt_get_facebook_page_likes(basename(get_post_meta($post->ID,'social_media_analytics_fb_media_account_link',true)));
@@ -401,15 +406,15 @@ $username = basename(get_post_meta($post->ID,'social_media_analytics_tw_media_ac
 		$totalnum = $totalnum + smt_get_twitter_follower( basename(get_post_meta($post->ID,'social_media_analytics_tw_media_account_link',true)) );
 		 ?>
 		 <strong>
-		 <?php 
+		 <?php
 		 echo $totalnum;
-		 ?>	
+		 ?>
 		 <input type="hidden" name="smt_total_followers" value="<?php echo $totalnum; ?>">
 		 </strong>
 		 </span>
 	</div>
 </div>
-<?php 
+<?php
 ?>
 	<?php
 }
@@ -463,7 +468,7 @@ function social_media_stats_save( $post_id ) {
 	update_post_meta($post_id,'fb_pe_female',$_POST['fb_pe_female']);
 
 
-	
+
 	// IG
 	if ( isset( $_POST['ig_total_likes'] ) )
 	update_post_meta($post_id,'ig_total_likes',$_POST['ig_total_likes']);
@@ -511,7 +516,7 @@ function social_media_stats_save( $post_id ) {
 		update_post_meta( $post_id, 'tw_higest_gender_age', esc_attr( $_POST['tw_higest_gender_age'] ) );
 	if ( isset( $_POST['tw_lowest_gender_age'] ) )
 		update_post_meta( $post_id, 'tw_lowest_gender_age', esc_attr( $_POST['tw_lowest_gender_age'] ) );
-	
+
 }
 add_action( 'save_post', 'social_media_stats_save' );
 
